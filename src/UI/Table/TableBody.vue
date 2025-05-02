@@ -1,10 +1,26 @@
 <script setup lang="ts">
 import { Team } from "./types/interface";
 import 'floating-vue/dist/style.css';
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
   const {groupTeam} = defineProps<{
     groupTeam: Team[]
   }>();
+
+  const isMobile = ref(false)
+  function checkMobile() {
+    isMobile.value = window.innerWidth < 768
+  }
+
+  onMounted(() => {
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', checkMobile)
+  })
+
 
   const sortedTeam = [...groupTeam].sort((a, b) => b.scored - a.scored)
 
@@ -15,13 +31,13 @@ import 'floating-vue/dist/style.css';
     <tr v-for="(info, index) in sortedTeam">
       <td>
         <div class="flex items-center md:gap-x-2 gap-x-1.5">
-          <VTooltip v-if="index === 0" placement="bottom-start">
+          <VTooltip v-if="index === 0" placement="bottom-start" :triggers="isMobile ? ['click'] : ['hover', 'focus']" :key="isMobile">
             <a class="info-count bg-[#00B86C]"> {{index + 1}}</a>
             <template #popper>
               Лига чемпионов УЕФА
             </template>
           </VTooltip>
-          <VTooltip v-else-if="index === 1 || index === 2" placement="bottom-start">
+          <VTooltip v-else-if="index === 1 || index === 2" placement="bottom-start" :triggers="isMobile ? ['click'] : ['hover', 'focus']" :key="isMobile">
             <a :class="['info-count', index === 1 && 'bg-[#00B86C]', index === 2 && 'bg-[#3188FF]']"> {{index + 1}}</a>
             <template #popper>
               Чемпионы Лига чемпионов УЕФА
