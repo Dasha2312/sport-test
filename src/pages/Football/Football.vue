@@ -23,8 +23,12 @@ async function getData() {
 
     teams.value = data;
     dataLoaded.value = true;
-  } catch (error) {
-    console.error(error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error("An unknown error occurred");
+    }
   }
 }
 
@@ -41,8 +45,12 @@ async function getGeneralData() {
     const generalData = await responce.json();
 
     generalInfo.value = generalData;
-  } catch (error) {
-    console.error(error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error("An unknown error occurred");
+    }
   }
 }
 
@@ -79,20 +87,21 @@ function updateHeaderTitle() {
   }
 }
 
-const tabTitle = [
+const tabTitle = ref([
   { id: 1, name: "Общая" },
   { id: 2, name: "Дома" },
   { id: 3, name: "В гостях" },
-];
+]);
 
 const selectedIndex = ref(0);
 
 function selectedTab(i: number) {
   selectedIndex.value = i;
 
-  this.tabTitle.forEach((tab: any, index: number) => {
+  tabTitle.value.forEach((tab: any, index: number) => {
     tab.isActive = i === index;
   });
+
 
   if(((selectedIndex.value === 1 || selectedIndex.value === 2) && !dataLoaded.value)) {
     getData();
